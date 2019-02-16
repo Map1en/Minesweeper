@@ -1,7 +1,9 @@
-var mineNum = 10;
-var sLength = 8;
-var step = 0;
-var openedBlock = 0;
+let mineNum = 10;
+let sLength = 8;
+let step = 0;
+let openedBlock = 0;
+let time = 0;
+
 
 class Block {
     constructor() {
@@ -16,38 +18,55 @@ class Area {
         this.array = [];
     }
     setBlock(x, y, z) {
-        for (let i = 0; i < y; i++) {
-            for (let j = 0; j < x; j++) {
-                this.array[j][i] = new Block();
+        for (let i = 0; i < x; i++) {
+            this.array[i] = [];
+            for (let j = 0; j < y; j++) {
+                this.array[i][j] = new Block();
             }
         }
-        for (let i = 0; i < z; i++) {
-            const r1 = (Math.random() * (x - 0 + 1) | 0) + 0;
-            const r2 = (Math.random() * (y - 0 + 1) | 0) + 0;
+        for (let k = 0; k < z; k++) {
+            const r1 = ~~(Math.random() * x);
+            const r2 = ~~(Math.random() * y);
             this.array[r1][r2].ismine = true;
         }
     }
     setFlag(x, y) {
         this.array[x][y].flagged = true;
-        mine--;
+        mineNum--;
     }
     setOpened(x, y) {
         this.array[x][y].opened = true;
     }
 }
 
-function setTimer() {
-    let time = 0;
-    var timer = setInterval(() => {
-        time++;
-    }, 1000);
+function op(data) {
+    alert(data);
 }
 
-function newGame(length, num) {
+function newGame(x, y, num) {
     let a1 = new Area();
-    a1.setBlock(length, length, num);
-    setTimer();
+    a1.setBlock(x, y, num);
+    time = 0;
+    timer = setInterval(() => {           //issue：多次点击好像会创建很多timer，加速计时
+        time++;
+        document.getElementById("timer").innerHTML = time;
+    }, 1000);
     step = 0;
+    openedBlock = 0;
+
+    let bArea = document.getElementById("block-area");
+    for (let i = 0; i < y; i++) {
+        let newDivy = document.createElement("div");
+        newDivy.className = "row";
+        for (let j = 0; j < x; j++) {
+            let newDivx = document.createElement("div");
+            newDivx.className = "unopened";
+            // let op = open(this);
+            newDivx.addEventListener("click", () => op(this));
+            newDivy.appendChild(newDivx);
+        }
+        bArea.appendChild(newDivy);
+    }
 }
 
 function win() {
@@ -84,19 +103,19 @@ function openBlock(x, y) {
         });
         if (count == 0) {
             count = ""; //不显示0
-            return around.forEach(function(item) {
-                openBlock((a1.array[item[0]] || {}), (a1.array[item[1]] || {}));
+            around.forEach(function(item) {
+                return openBlock((a1.array[item[0]] || {}), (a1.array[item[1]] || {}));
             });
-        }else {
+        } else {
             //显示数字
         }
-        }
     }
+}
 
 function click(x, y) {
-    if(a1.array[x][y].ismine) {
+    if (a1.array[x][y].ismine) {
         lose();
-    }else {
+    } else {
         openBlock(x, y);
         step++;
     }
@@ -118,7 +137,8 @@ function doubleClick(x, y) {
         around.forEach(function(item) {
             if ((a1.array[item[0]] || {})([item[1]] || {}).ismine) {
                 mCount++;
-            }else if ((a1.array[item[0]] || {})([item[1]] || {}).flagged) {
+            }
+            if ((a1.array[item[0]] || {})([item[1]] || {}).flagged) {
                 fCount++;
             }
         });
@@ -128,10 +148,15 @@ function doubleClick(x, y) {
                     if (!((a1.array[item[0]] || {})([item[1]] || {}).flagged)) {
                         lose();
                     }
-                }else {
+                } else {
                     openBlock((a1.array[item[0]] || {}), (a1.array[item[1]] || {}));
                 }
             });
         }
     }
 }
+
+document.getElementById("newBtn").addEventListener("click", () => newGame(sLength, sLength, mineNum));
+document.getElementById("mine").innerHTML = mineNum;
+document.getElementById("step").innerHTML = step;
+document.getElementById("timer").innerHTML = time;

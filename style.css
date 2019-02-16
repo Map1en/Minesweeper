@@ -1,0 +1,30 @@
+body {
+    background-color: beige;
+    text-align:center;
+}
+
+#bar p {
+    display:inline-block;
+}
+
+#block-area {
+    display:inline-block;
+}
+
+.unopened {
+    width: 28px;
+    height: 28px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.row {
+    border-style: none;
+    width: 250px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: stretch;
+    text-align:center;
+}
