@@ -1,5 +1,5 @@
 let mineNum = 10;
-let sLength = 8;
+let sLength = 9;
 let step = 0;
 let openedBlock = 0;
 let time = 0;
@@ -41,9 +41,6 @@ class Area {
 let a1 = new Area();
 let bArea = document.getElementById("block-area");
 
-function op(data) {
-    console.log(data);
-}
 
 function newGame(x, y, num) {
     a1.setBlock(x, y, num);
@@ -89,6 +86,8 @@ function openBlock(x, y) {
         if (openedBlock == notMine) {
             win();
         }
+        x = parseInt(x);
+        y = parseInt(y);
         const around = [
             [x - 1, y - 1],
             [x, y - 1],
@@ -108,10 +107,10 @@ function openBlock(x, y) {
         if (count == 0) {
             count = ""; //不显示0
             around.forEach(function(item) {
-                return openBlock((a1.array[item[0]] || {}), (a1.array[item[1]] || {}));
+                return openBlock(item[0] || {}, item[1] || {});
             });
         } else {
-            //显示数字
+            bArea.children[y].children[x].innerHTML = count;
         }
     }
 }
@@ -128,6 +127,7 @@ function click(x, y) {
 
 function doubleClick(x, y) {
     if (a1.array[x][y].opened) {
+
         const around = [
             [x - 1, y - 1],
             [x, y - 1],
