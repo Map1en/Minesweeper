@@ -18,6 +18,14 @@ body {
     border-style: solid;
 }
 
+.opened {
+    width: 28px;
+    height: 28px;
+    border-width: 1px;
+    border-style: solid;
+    background-color: #fff;
+}
+
 .row {
     border-style: none;
     width: 250px;

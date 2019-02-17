@@ -4,7 +4,6 @@ let step = 0;
 let openedBlock = 0;
 let time = 0;
 
-
 class Block {
     constructor() {
         this.opened = false;
@@ -39,12 +38,14 @@ class Area {
     }
 }
 
+let a1 = new Area();
+let bArea = document.getElementById("block-area");
+
 function op(data) {
-    alert(data);
+    console.log(data);
 }
 
 function newGame(x, y, num) {
-    let a1 = new Area();
     a1.setBlock(x, y, num);
     time = 0;
     timer = setInterval(() => {           //issue：多次点击好像会创建很多timer，加速计时
@@ -54,15 +55,15 @@ function newGame(x, y, num) {
     step = 0;
     openedBlock = 0;
 
-    let bArea = document.getElementById("block-area");
     for (let i = 0; i < y; i++) {
         let newDivy = document.createElement("div");
         newDivy.className = "row";
         for (let j = 0; j < x; j++) {
             let newDivx = document.createElement("div");
             newDivx.className = "unopened";
-            // let op = open(this);
-            newDivx.addEventListener("click", () => op(this));
+            newDivx.setAttribute("x", j);
+            newDivx.setAttribute("y", i);
+            newDivx.addEventListener("click", (event) =>click(event.srcElement.attributes.x.value, event.srcElement.attributes.y.value));
             newDivy.appendChild(newDivx);
         }
         bArea.appendChild(newDivy);
@@ -70,18 +71,21 @@ function newGame(x, y, num) {
 }
 
 function win() {
-    clearInterval(timer);
+    // clearInterval(timer);
+    console.log(win);
 }
 
 function lose() {
-    clearInterval(timer);
+    // clearInterval(timer);
+    console.log(lose)
 }
 
 function openBlock(x, y) {
     if (!a1.array[x][y].flagged) {
         a1.array[x][y].opened = true;
+        bArea.children[y].children[x].setAttribute("class", "opened");
         openedBlock++;
-        notMine = length * length - mineNum;
+        notMine = sLength * sLength - mineNum;
         if (openedBlock == notMine) {
             win();
         }
@@ -97,7 +101,7 @@ function openBlock(x, y) {
         ];
         let count = 0;
         around.forEach(function(item) {
-            if ((a1.array[item[0]] || {})([item[1]] || {}).ismine) {
+            if (((a1.array[item[0]] || {})[item[1]] || {}).ismine) {
                 count++;
             }
         });
@@ -118,6 +122,7 @@ function click(x, y) {
     } else {
         openBlock(x, y);
         step++;
+        document.getElementById("step").innerHTML = step;
     }
 }
 
