@@ -1,5 +1,5 @@
 body {
-    background-color: beige;
+    background-color: rgb(247, 247, 238);
     text-align:center;
 }
 
@@ -15,20 +15,21 @@ body {
     width: 28px;
     height: 28px;
     border-width: 1px;
-    border-style: solid;
+    border-style: outset;
+    background-color: rgb(116, 107, 91);
 }
 
 .opened {
     width: 28px;
     height: 28px;
     border-width: 1px;
-    border-style: solid;
-    background-color: #fff;
+    border-style: outset;
+    background-color:rgb(156, 156, 156);
 }
 
 .row {
     border-style: none;
-    width: 250px;
+    width: 910px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
