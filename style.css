@@ -36,3 +36,15 @@ body {
     align-items: stretch;
     text-align:center;
 }
+
+.bomb {
+    background-color:red;
+}
+
+.bomb0 {
+    background-color: rgb(146, 0, 0);
+}
+
+.flagged {
+    background-color: blue;
+}
