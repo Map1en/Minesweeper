@@ -12,9 +12,7 @@ let isOver = false;
 let bArea = document.getElementById("block-area");
 
 //DOM
-document.oncontextmenu = function (event) {
-    event.preventDefault();
-};
+document.oncontextmenu = ((event) => event.preventDefault());
 document.getElementById("easy").addEventListener("click", () => selectLevel("easy"));
 document.getElementById("normal").addEventListener("click", () => selectLevel("normal"));
 document.getElementById("hard").addEventListener("click", () => selectLevel("hard"));
@@ -111,9 +109,11 @@ class Block {
             Timer();
         }
         if (!isOver && !this.array[x][y].opened) {
-            step++;
-            document.getElementById("step").innerHTML = step;
-            this.openBlock(x, y);
+            if (!this.array[x][y].flagged) {
+                this.openBlock(x, y);
+                step++;
+                document.getElementById("step").innerHTML = step;
+            }
         }
     }
     openBlock(x, y) {
@@ -203,7 +203,9 @@ function confirmNext(result) {
             }
             break;
         case "lose":
-            if (confirm("糟糕踩到雷啦！要不要重开一盘？")) {
+            let percent = openedBlock / game.notMine * 100;
+            percent = percent.toFixed(2);
+            if (confirm("糟糕踩到雷啦！完成度"+percent+"%！要不要重开一盘？")) {
                 Reset();
                 game.setMinefield(xLength, yLength);
             }
@@ -260,7 +262,7 @@ function selectLevel(level) {
 
 //Tools
 function Timer() {
-    timer = setInterval(() => {           //issue：多次点击好像会创建很多timer，加速计时
+    timer = setInterval(() => {
         time++;
         document.getElementById("timer").innerHTML = time;
     }, 1000);
