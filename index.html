@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <meta charset="utf-8">
-    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
     <title>Minesweeper</title>
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div>
-        <div>Minesweeper</div>
-        <div>
-            <div id="bar">
-                <button id="newBtn">NewGame</button>
-                <button id="easy">初级</button>
-                <button id="normal">中级</button>
-                <button id="hard">专家</button>
-                <p id="mine"></p>
-                <p id="step"></p>
-                <p id="timer"></p>
+        <h1>Minesweeper</h1>
+        <div id="bar">
+            <div class="label">
+                <div class="btn" id="newBtn">新游戏</div>
+            </div>
+            <div class="label" id="select">
+                <div class="unselected" id="easy">新手</div>
+                <div class="selected" id="normal">普通</div>
+                <div class="unselected" id="hard">困难</div>
+            </div>
+            <div class="label" style="width: 120px;">
+                <div class="icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <div id="mine"></div>
+            </div>
+            <div class="label" style="width: 120px;">
+                <div class="icon">
+                    <i class="fas fa-shoe-prints"></i>
+                </div>
+                <div id="step"></div>
+            </div>
+            <div class="label" style="width: 120px;">
+                <div class="icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div id="timer"></div>
             </div>
         </div>
         <hr>
-        <br>
         <div id="block-area"></div>
     </div>
 </body>

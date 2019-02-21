@@ -1,8 +1,10 @@
 //Data
-let mineNum = 10;
+let mineNum = 40;
 let flaggedMine = 0;
-let xLength = 9;
-let yLength = 9;
+let xLength = 16;
+let yLength = 16;
+let width = 480;
+let height = 480;
 let step = 0;
 let openedBlock = 0;
 let time = 0;
@@ -10,6 +12,9 @@ let timer;
 let isOver = false;
 
 let bArea = document.getElementById("block-area");
+let easyLevel = document.getElementById("easy");
+let normalLevel = document.getElementById("normal");
+let hardLevel = document.getElementById("hard");
 
 //DOM
 document.oncontextmenu = ((event) => event.preventDefault());
@@ -69,6 +74,7 @@ class Block {
                 newDivx.className = "unopened";
                 newDivx.setAttribute("x", j);
                 newDivx.setAttribute("y", i);
+                //添加点击事件
                 newDivx.addEventListener(
                     "click", (event) => this.perOpen(
                         event.srcElement.attributes.x.value, event.srcElement.attributes.y.value
@@ -81,6 +87,7 @@ class Block {
                 );
                 newDivy.appendChild(newDivx);
             }
+            bArea.setAttribute("style", "width: " + width +"px; height: "+ height +"px;")
             bArea.appendChild(newDivy);
         }
     }
@@ -97,9 +104,15 @@ class Block {
                     flaggedMine++;
                 }
                 document.getElementById("mine").innerHTML = mineNum - flaggedMine;
+                step++;
+                document.getElementById("step").innerHTML = step;
             } else {
                 this.array[x][y].flagged = false;
                 bArea.children[y].children[x].classList.remove("flagged");
+                flaggedMine--;
+                document.getElementById("mine").innerHTML = mineNum - flaggedMine;
+                step++;
+                document.getElementById("step").innerHTML = step;
             }
         }
     }
@@ -162,6 +175,7 @@ class Block {
                         }
                     });
                 } else {
+                    bArea.children[y].children[x].classList.add("mark" + count);
                     bArea.children[y].children[x].innerHTML = count;
                 }
             }
@@ -189,6 +203,9 @@ function lose(x, y) {
             if (game.array[i][j].isMine) {
                 bArea.children[j].children[i].classList.add("bomb");
             }
+            if (game.array[i][j].flagged && !game.array[i][j].isMine) {
+                bArea.children[j].children[i].classList.add("wrongflag");
+            }
         }
     }
     window.setTimeout(() => confirmNext("lose"), 500);
@@ -197,7 +214,7 @@ function lose(x, y) {
 function confirmNext(result) {
     switch (result) {
         case "win":
-            if (confirm("胜利！要进行下盘游戏吗？")) {
+            if (confirm("胜利！用时" + (time / 1000).toFixed(2) + "！要进行下盘游戏吗？")) {
                 Reset();
                 game.setMinefield(xLength, yLength);
             }
@@ -216,6 +233,9 @@ function confirmNext(result) {
 //NewGame
 function newGame() {
     if (!bArea.firstChild) {
+        game.setMinefield(xLength, yLength);
+    } else if (time == 0){
+        Reset();
         game.setMinefield(xLength, yLength);
     } else if (confirm("是否要重置游戏？")) {
         Reset();
@@ -244,16 +264,31 @@ function selectLevel(level) {
             mineNum = 10;
             xLength = 9;
             yLength = 9;
+            easyLevel.setAttribute("class", "selected");
+            normalLevel.setAttribute("class", "unselected");
+            hardLevel.setAttribute("class", "unselected");
+            width = 270;
+            height = 270;
             break;
         case "normal":
             mineNum = 40;
             xLength = 16;
             yLength = 16;
+            easyLevel.setAttribute("class", "unselected");
+            normalLevel.setAttribute("class", "selected");
+            hardLevel.setAttribute("class", "unselected");
+            width = 480;
+            height = 480;
             break;
         case "hard":
             mineNum = 99;
             xLength = 30;
             yLength = 16;
+            easyLevel.setAttribute("class", "unselected");
+            normalLevel.setAttribute("class", "unselected");
+            hardLevel.setAttribute("class", "selected");
+            width = 900;
+            height = 480;
             break;
     }
     newGame();
@@ -264,14 +299,15 @@ function selectLevel(level) {
 function Timer() {
     timer = setInterval(() => {
         time++;
-        document.getElementById("timer").innerHTML = time;
-    }, 1000);
+        document.getElementById("timer").innerHTML = (time / 100).toFixed(0);
+    }, 10);
 }
 
 function between(x, max) {
     return x >= 0 && x <= (max - 1);
 }
 
+window.onload = newGame();
 
 
 //------------------------------------------------------------------
