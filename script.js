@@ -17,11 +17,10 @@ let normalLevel = document.getElementById("normal");
 let hardLevel = document.getElementById("hard");
 
 //DOM
-document.oncontextmenu = ((event) => event.preventDefault());
 document.getElementById("easy").addEventListener("click", () => selectLevel("easy"));
 document.getElementById("normal").addEventListener("click", () => selectLevel("normal"));
 document.getElementById("hard").addEventListener("click", () => selectLevel("hard"));
-document.getElementById("newBtn").addEventListener("click", () => newGame(xLength, yLength, mineNum));
+document.getElementById("newBtn").addEventListener("click", () => newGame());
 document.getElementById("mine").innerHTML = mineNum;
 document.getElementById("step").innerHTML = step;
 document.getElementById("timer").innerHTML = time;
@@ -81,9 +80,12 @@ class Block {
                     )
                 );
                 newDivx.addEventListener(
-                    "auxclick", (event) => this.setFlag(
-                        event.srcElement.attributes.x.value, event.srcElement.attributes.y.value
-                    )
+                    "auxclick", (event) => {
+                        this.setFlag(
+                            event.srcElement.attributes.x.value, event.srcElement.attributes.y.value
+                        );
+                        event.preventDefault();
+                    }
                 );
                 newDivy.appendChild(newDivx);
             }
