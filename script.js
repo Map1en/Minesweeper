@@ -58,6 +58,12 @@ class Block {
             }
         }
     }
+    detectSetMine(x, y) {
+        if (this.array[0] == undefined) {
+            this.setMine(x, y);
+            Timer();
+        }
+    }
     removeMinefield() {
         while (bArea.firstChild) {
             bArea.removeChild(bArea.firstChild);
@@ -94,40 +100,27 @@ class Block {
         }
     }
     setFlag(x, y) {
-        if (this.array[0] == undefined) {
-            this.setMine(x, y);
-            Timer();
-        }
+        this.detectSetMine(x, y);
         if (!this.array[x][y].opened) {
             if (!this.array[x][y].flagged) {
                 this.array[x][y].flagged = true;
                 bArea.children[y].children[x].classList.add("flagged");
-                if (flaggedMine < mineNum) {
-                    flaggedMine++;
-                }
-                document.getElementById("mine").innerHTML = mineNum - flaggedMine;
-                step++;
-                document.getElementById("step").innerHTML = step;
+                if (flaggedMine < mineNum) { flaggedMine++; }
             } else {
                 this.array[x][y].flagged = false;
                 bArea.children[y].children[x].classList.remove("flagged");
-                flaggedMine--;
-                document.getElementById("mine").innerHTML = mineNum - flaggedMine;
-                step++;
-                document.getElementById("step").innerHTML = step;
+                if (flaggedMine > 0) { flaggedMine--; }
             }
         }
+        setStep();
+        setMineNum();
     }
     perOpen(x, y) {
-        if (this.array[0] == undefined) {
-            this.setMine(x, y);
-            Timer();
-        }
+        this.detectSetMine(x, y);
         if (!isOver && !this.array[x][y].opened) {
             if (!this.array[x][y].flagged) {
                 this.openBlock(x, y);
-                step++;
-                document.getElementById("step").innerHTML = step;
+                setStep();
             }
         }
     }
@@ -217,7 +210,7 @@ function confirmNext(result) {
     switch (result) {
         case "win":
             if (confirm("胜利！用时" + (time / 1000).toFixed(2) + "！要进行下盘游戏吗？")) {
-                Reset();
+                reSet();
                 game.setMinefield(xLength, yLength);
             }
             break;
@@ -225,7 +218,7 @@ function confirmNext(result) {
             let percent = openedBlock / game.notMine * 100;
             percent = percent.toFixed(2);
             if (confirm("糟糕踩到雷啦！完成度"+percent+"%！要不要重开一盘？")) {
-                Reset();
+                reSet();
                 game.setMinefield(xLength, yLength);
             }
             break;
@@ -237,15 +230,15 @@ function newGame() {
     if (!bArea.firstChild) {
         game.setMinefield(xLength, yLength);
     } else if (time == 0){
-        Reset();
+        reSet();
         game.setMinefield(xLength, yLength);
     } else if (confirm("是否要重置游戏？")) {
-        Reset();
+        reSet();
         game.setMinefield(xLength, yLength);
     }
 }
 
-function Reset() {
+function reSet() {
     clearInterval(timer);
     isOver = false;
     step = 0;
@@ -298,6 +291,15 @@ function selectLevel(level) {
 }
 
 //Tools
+function setStep() {
+    step++;
+    document.getElementById("step").innerHTML = step;
+}
+
+function setMineNum() {
+    document.getElementById("mine").innerHTML = mineNum - flaggedMine;
+}
+
 function Timer() {
     timer = setInterval(() => {
         time++;
