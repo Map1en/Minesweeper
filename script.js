@@ -1,29 +1,20 @@
-//Data
-let mineNum = 40;
-let flaggedMine = 0;
-let xLength = 16;
-let yLength = 16;
-let width = 480;
-let height = 480;
-let step = 0;
-let openedBlock = 0;
-let time = 0;
+//initData
+let blockData = {
+    xLen : 16,
+    yLen : 16,
+    mineNum : 40,
+    width : 480,
+    height : 480
+}
 let timer;
-let isOver = false;
 
+//DOM
 let bArea = document.getElementById("block-area");
 let easyLevel = document.getElementById("easy");
 let normalLevel = document.getElementById("normal");
 let hardLevel = document.getElementById("hard");
 
-//DOM
-document.getElementById("easy").addEventListener("click", () => selectLevel("easy"));
-document.getElementById("normal").addEventListener("click", () => selectLevel("normal"));
-document.getElementById("hard").addEventListener("click", () => selectLevel("hard"));
-document.getElementById("newBtn").addEventListener("click", () => newGame());
-document.getElementById("mine").innerHTML = mineNum;
-document.getElementById("step").innerHTML = step;
-document.getElementById("timer").innerHTML = time;
+setBar();
 
 //Class
 class Attr {
@@ -40,15 +31,15 @@ class Block {
         this.notMine;
     }
     setMine(x, y) {
-        for (let i = 0; i < xLength; i++) {
+        for (let i = 0; i < blockData["xLen"]; i++) {
             this.array[i] = [];
-            for (let j = 0; j < yLength; j++) {
+            for (let j = 0; j < blockData["yLen"]; j++) {
                 this.array[i][j] = new Attr();
             }
         }
-        for (let k = 0; k < mineNum; k++) {
-            const R1 = ~~(Math.random() * xLength);
-            const R2 = ~~(Math.random() * yLength);
+        for (let k = 0; k < blockData["mineNum"]; k++) {
+            const R1 = ~~(Math.random() * blockData["xLen"]);
+            const R2 = ~~(Math.random() * blockData["yLen"]);
             if (R1 == x && R2 == y) {      //第一次点击不会踩雷
                 k--;
             } else if (this.array[R1][R2].isMine) {
@@ -70,7 +61,7 @@ class Block {
         }
     }
     setMinefield(x, y) {
-        this.notMine = xLength * yLength - mineNum;
+        this.notMine = blockData["xLen"] * blockData["yLen"] - blockData["mineNum"];
         for (let i = 0; i < y; i++) {
             let newDivy = document.createElement("div");
             newDivy.className = "row";
@@ -86,17 +77,15 @@ class Block {
                     )
                 );
                 newDivx.addEventListener(
-                    "auxclick", (event) => {
-                        this.setFlag(
-                            event.srcElement.attributes.x.value, event.srcElement.attributes.y.value
-                        );
-                        event.preventDefault();
-                    }
+                    "contextmenu", (event) => this.setFlag(
+                        event.srcElement.attributes.x.value, event.srcElement.attributes.y.value
+                    )
                 );
                 newDivy.appendChild(newDivx);
             }
-            bArea.setAttribute("style", "width: " + width +"px; height: "+ height +"px;")
+            bArea.setAttribute("style", "width: " + blockData["width"] +"px; height: "+ blockData["height"] +"px;")
             bArea.appendChild(newDivy);
+            bArea.addEventListener("contextmenu", (event) => event.preventDefault());  //点到缝隙会出菜单，改至上层div禁用
         }
     }
     setFlag(x, y) {
@@ -105,11 +94,11 @@ class Block {
             if (!this.array[x][y].flagged) {
                 this.array[x][y].flagged = true;
                 bArea.children[y].children[x].classList.add("flagged");
-                if (flaggedMine < mineNum) { flaggedMine++; }
+                if (flaggedMine < blockData["mineNum"]) flaggedMine++;
             } else {
                 this.array[x][y].flagged = false;
                 bArea.children[y].children[x].classList.remove("flagged");
-                if (flaggedMine > 0) { flaggedMine--; }
+                if (flaggedMine > 0) flaggedMine--;
             }
         }
         setStep();
@@ -128,20 +117,11 @@ class Block {
         if (!this.array[x][y].isMine) {
             if (!this.array[x][y].flagged) {
                 this.array[x][y].opened = true;
-                bArea.children[y].children[x].setAttribute("class", "opened");
+                bArea.children[y].children[x].className = "opened";
                 openedBlock++;
-                if (openedBlock == this.notMine) {
-                    for (let i = 0; i < xLength; i++) {
-                        for (let j = 0; j < yLength; j++) {
-                            if (!this.array[i][j].opened) {
-                                bArea.children[j].children[i].classList.add("bomb");
-                            }
-                        }
-                    }
-                    win();
-                }
-                x = parseInt(x);
-                y = parseInt(y);
+                if (openedBlock == this.notMine) result(true);
+                x = +x;
+                y = +y;
                 const AROUND = [
                     [x - 1, y - 1],
                     [x, y - 1],
@@ -154,16 +134,13 @@ class Block {
                 ];
                 let count = 0;
                 AROUND.forEach((item) => {
-                    if (between(item[0], xLength) && between(item[1], yLength)) {
-                        if (((this.array[item[0]] || {})[item[1]] || {}).isMine) {
-                            count++;
-                        }
+                    if (between(item[0], blockData["xLen"]) && between(item[1], blockData["yLen"])) {
+                        if (((this.array[item[0]] || {})[item[1]] || {}).isMine) count++;
                     }
                 });
                 if (count == 0) {
-                    count = ""; //不显示0
                     AROUND.forEach((item) => {
-                        if (between(item[0], xLength) && between(item[1], yLength)) {
+                        if (between(item[0], blockData["xLen"]) && between(item[1], blockData["yLen"])) {
                             if (!(this.array[item[0]][item[1]].opened)) {
                                 return this.openBlock(item[0], item[1]);
                             }
@@ -175,129 +152,120 @@ class Block {
                 }
             }
         } else {
-            lose(x, y);
+            result(false, x, y);
+        }
+    }
+    gameOver(result, x, y) {
+        if (result) {
+            for (let i = 0; i < blockData["xLen"]; i++) {
+                for (let j = 0; j < blockData["yLen"]; j++) {
+                    if (!this.array[i][j].opened) {
+                        bArea.children[j].children[i].classList.add("flagged");
+                    }
+                }
+            }
+        } else {
+            bArea.children[y].children[x].classList.add("bomb0");
+            for (let i = 0; i < blockData["xLen"]; i++) {
+                for (let j = 0; j < blockData["yLen"]; j++) {
+                    if (this.array[i][j].isMine) {
+                        bArea.children[j].children[i].classList.add("bomb");
+                    }
+                    if (this.array[i][j].flagged && !this.array[i][j].isMine) {
+                        bArea.children[j].children[i].classList.add("wrongflag");
+                    }
+                }
+            }
         }
     }
 }
 
 let game = new Block();
 
-//Result
-function win() {
-    clearInterval(timer);
+function result(end, x, y) {
+    stopTimer();
     isOver = true;
-    window.setTimeout(() => confirmNext("win"), 500);
-}
-
-function lose(x, y) {
-    clearInterval(timer);
-    isOver = true;
-    bArea.children[y].children[x].classList.add("bomb0");
-    for (let i = 0; i < xLength; i++) {
-        for (let j = 0; j < yLength; j++) {
-            if (game.array[i][j].isMine) {
-                bArea.children[j].children[i].classList.add("bomb");
-            }
-            if (game.array[i][j].flagged && !game.array[i][j].isMine) {
-                bArea.children[j].children[i].classList.add("wrongflag");
-            }
-        }
-    }
-    window.setTimeout(() => confirmNext("lose"), 500);
+    game.gameOver(end, x, y);
+    window.setTimeout(() => confirmNext(end), 500);
 }
 
 function confirmNext(result) {
-    switch (result) {
-        case "win":
-            if (confirm("胜利！用时" + (time / 1000).toFixed(2) + "！要进行下盘游戏吗？")) {
-                reSet();
-                game.setMinefield(xLength, yLength);
-            }
-            break;
-        case "lose":
-            let percent = openedBlock / game.notMine * 100;
-            percent = percent.toFixed(2);
-            if (confirm("糟糕踩到雷啦！完成度"+percent+"%！要不要重开一盘？")) {
-                reSet();
-                game.setMinefield(xLength, yLength);
-            }
-            break;
+    let percent = (openedBlock / game.notMine * 100).toFixed(2);
+    let message = {
+        1 : "胜利！用时" + (time / 100).toFixed(2) + "秒！要进行下盘游戏吗？",
+        2 : "糟糕踩到雷啦！完成度"+percent+"%！要不要重开一盘？"
+    };
+    if (result ? confirm(message[1]) : confirm(message[2])) {
+        initGame();
+        game.setMinefield(blockData["xLen"], blockData["yLen"]);
     }
 }
 
-//NewGame
 function newGame() {
-    if (!bArea.firstChild) {
-        game.setMinefield(xLength, yLength);
-    } else if (time == 0){
-        reSet();
-        game.setMinefield(xLength, yLength);
-    } else if (confirm("是否要重置游戏？")) {
-        reSet();
-        game.setMinefield(xLength, yLength);
+    if ((!bArea.firstChild || time == 0) ? true : confirm("是否要重置游戏？")) {
+        initGame();
+        game.setMinefield(blockData["xLen"], blockData["yLen"]);
     }
 }
 
-function reSet() {
-    clearInterval(timer);
-    isOver = false;
-    step = 0;
-    openedBlock = 0;
+function initGame() {
+    stopTimer();
     time = 0;
+    step = 0;
     flaggedMine = 0;
-    document.getElementById("timer").innerHTML = time;
-    document.getElementById("mine").innerHTML = mineNum;
-    document.getElementById("step").innerHTML = step;
+    openedBlock = 0;
+    isOver = false;
+    setInnerById("mine", blockData["mineNum"]);
+    setInnerById("step", step);
+    setInnerById("timer", time);
     game.removeMinefield();
     game.array = [];
 }
 
-//Level
 function selectLevel(level) {
+    const DIFF = {
+        easy :   { xLen : 9, yLen : 9, mineNum : 10, width : 270, height : 270 },
+        normal : { xLen : 16, yLen : 16, mineNum : 40, width : 480, height : 480 },
+        hard :   { xLen : 30, yLen : 16, mineNum : 99, width : 900, height : 480 }
+    }
     switch (level) {
         case "easy":
-            mineNum = 10;
-            xLength = 9;
-            yLength = 9;
-            easyLevel.setAttribute("class", "selected");
-            normalLevel.setAttribute("class", "unselected");
-            hardLevel.setAttribute("class", "unselected");
-            width = 270;
-            height = 270;
+            blockData = DIFF["easy"];
+            easyLevel.className = "selected";
+            normalLevel.className = "unselected";
+            hardLevel.className = "unselected";
             break;
         case "normal":
-            mineNum = 40;
-            xLength = 16;
-            yLength = 16;
-            easyLevel.setAttribute("class", "unselected");
-            normalLevel.setAttribute("class", "selected");
-            hardLevel.setAttribute("class", "unselected");
-            width = 480;
-            height = 480;
+            blockData = DIFF["normal"];
+            easyLevel.className = "unselected";
+            normalLevel.className = "selected";
+            hardLevel.className = "unselected";
             break;
         case "hard":
-            mineNum = 99;
-            xLength = 30;
-            yLength = 16;
-            easyLevel.setAttribute("class", "unselected");
-            normalLevel.setAttribute("class", "unselected");
-            hardLevel.setAttribute("class", "selected");
-            width = 900;
-            height = 480;
+            blockData = DIFF["hard"];
+            easyLevel.className = "unselected";
+            normalLevel.className = "unselected";
+            hardLevel.className = "selected";
             break;
     }
     newGame();
-    document.getElementById("mine").innerHTML = mineNum;
 }
 
 //Tools
+function setBar() {
+    easyLevel.addEventListener("click", () => selectLevel("easy"));
+    normalLevel.addEventListener("click", () => selectLevel("normal"));
+    hardLevel.addEventListener("click", () => selectLevel("hard"));
+    document.getElementById("newBtn").addEventListener("click", () => newGame());
+}
+
 function setStep() {
     step++;
     document.getElementById("step").innerHTML = step;
 }
 
 function setMineNum() {
-    document.getElementById("mine").innerHTML = mineNum - flaggedMine;
+    document.getElementById("mine").innerHTML = blockData["mineNum"] - flaggedMine;
 }
 
 function Timer() {
@@ -305,6 +273,14 @@ function Timer() {
         time++;
         document.getElementById("timer").innerHTML = (time / 100).toFixed(0);
     }, 10);
+}
+
+function stopTimer() {
+    clearInterval(timer);
+}
+
+function setInnerById(id, content) {
+    document.getElementById(id).innerHTML = content;
 }
 
 function between(x, max) {
