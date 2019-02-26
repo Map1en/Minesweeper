@@ -62,6 +62,10 @@ h1 {
     border-left-style: none;
 }
 
+#level div {
+    display: inline-block;
+}
+
 .icon {
     color: #f6f7f8;
     background-color: #373c38;
@@ -111,6 +115,11 @@ h1 {
     margin: 50px auto;
 }
 
+.row {
+    display: flex;
+    flex: 1;
+}
+
 .unopened {
     width: 28px;
     height: 28px;
@@ -145,45 +154,12 @@ h1 {
     font-size: 21px;
 }
 
-.row {
-    display: flex;
-    flex: 1;
-}
-
-.bomb::before {
-    color: #373c38;
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    font-size: large;
-    content: '\F0A3';
-}
-
-.bomb0 {
-    background: #d23f40;
-}
-
-.bomb0:hover {
-    background: #d23f40;
-}
-
-.bomb0::before {
-    color: #f6f7f8;
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    font-size: large;
-    content: '\F0A3';
-}
-
 .flagged::before {
     color: #d23f40;
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     font-size: large;
     content: '\F024';
-}
-
-#level div {
-    display: inline-block;
 }
 
 .mark1 {
@@ -216,6 +192,30 @@ h1 {
 
 .mark8 {
     color: #94a8b0;
+}
+
+.bomb::before {
+    color: #373c38;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: large;
+    content: '\F0A3';
+}
+
+.bomb0 {
+    background: #d23f40;
+}
+
+.bomb0:hover {
+    background: #d23f40;
+}
+
+.bomb0::before {
+    color: #f6f7f8;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: large;
+    content: '\F0A3';
 }
 
 .wrongflag::before {
