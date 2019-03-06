@@ -39,7 +39,7 @@ h1 {
 }
 
 .data:hover {
-    background-color: #373C38;
+    background-color: #F6F7F8;
 }
 
 #newBtn {
@@ -62,8 +62,20 @@ h1 {
     border-left-style: none;
 }
 
-#level div {
-    display: inline-block;
+#select div {
+    display: block;
+    float: left;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-left-style: solid;
+    border-color: #373c38;
+    border-width: 1px;
+    transition: 0.2s;
+}
+
+#select div:hover {
+    background-color: #7B7C7D;
+    color: #F6F7F8;;
 }
 
 .icon {
@@ -75,29 +87,8 @@ h1 {
 }
 
 .selected {
-    float: left;
-    padding-left: 20px;
-    padding-right: 20px;
-    border-left-style: solid;
-    background-color: #373C38;
     color: #F6F7F8;
-    border-color: #373c38;
-    border-width: 1px;
-}
-
-.unselected {
-    float: left;
-    padding-left: 20px;
-    padding-right: 20px;
-    border-left-style: solid;
-    border-color: #373c38;
-    border-width: 1px;
-    transition: 0.2s;
-}
-
-.unselected:hover {
-    background-color: #7B7C7D;
-    color: #F6F7F8;;
+    background-color: #373c38;
 }
 
 .level:hover {
