@@ -59,6 +59,91 @@ let Bar = new Vue({
     }
 });
 
+let Grid = new Vue({
+    el: '#grid',
+    template:
+        `
+        <div id="grid" :style="field.size">
+            <div class="row" v-for="y in field.y" :key="y.id">
+                <div
+                    class="block" :class="isOpened(x, y)" v-for="x in field.x" :key="x.id" :x="x" :y="y"
+                ></div>
+            </div>
+        </div>
+        `,
+    data: {
+        field: {
+            x: 16,
+            y: 16,
+            mineNum: 40,
+            size: {width: '480px', height: '480px'}
+        },
+    },
+    computed: {
+        isOpened: function (x, y) {
+            Block.initData();
+            return {
+                opened : Block.Opened(x, y)
+            };
+        }
+    },
+    methods: {
+        switchGrid: function (level) {
+            this.field = Game.diff[level];
+        },
+        openGrid: function (x, y) {
+            if (Game.GameStart(x, y)) {
+                if (!Game.isOver && !Block.Opened(x, y)) {
+                    if (!Block.Flagged(x, y)) {
+                        Game.openBlock();
+                    }
+                }
+            }
+        },
+        setFlag: function (x, y) {
+            if (Game.GameStart(x, y)) {
+                if (!Block.Opened(x, y)) {
+                    if (!Block.Flagged(x, y)) {
+                        Block.setFlagged();
+                        //add::before
+                        Bar.setMineNum(-1);
+                    } else {
+                        Block.removeFlagged();
+                        ////remove::before
+                        Bar.setMineNum(1);
+                    }
+                }
+            }
+        },
+        removeGrid: function () {  //应该不用这个
+            ;
+        },
+        setGameOver: function (bool, x, y) {
+            if (bool) {
+                for (let i = 0; i < this.field.x; i++) {
+                    for (let j = 0; j < this.field.y; j++) {
+                        if (!Block.Opened(x, y)) {
+                            //add flag
+                        }
+                    }
+                }
+            } else {
+                //add bomb0
+                for (let i = 0; i < this.field.x; i++) {
+                    for (let j = 0; j < this.field.y; j++) {
+                        if (Block.isBomb(i, j)) {
+                            //add bomb
+                        }
+                        if (Block.Flagged(i, j) && !Block.isBomb(i, j)) {
+                            //add wrongflag
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+
 let Block = new Vue({
     data: {
         isMine: [],
@@ -84,17 +169,17 @@ let Block = new Vue({
                 const R2 = ~~(Math.random() * Grid.field.y);
                 if (R1 == x && R2 == y) {
                     k--;
-                } else if (this.isMine[R1][R2]) {
+                } else if (this.isBomb(R1, R2)) {
                     k--;
                 } else {
                     this.isMine[R1][R2] = true;
                 }
             }
         },
-        isOpened: function (x, y) {
+        Opened: function (x, y) {
             return this.isOpened[x][y];
         },
-        isFlagged: function (x, y) {
+        Flagged: function (x, y) {
             return this.isFlagged[x][y];
         },
         isBomb: function (x, y) {
@@ -114,91 +199,6 @@ let Block = new Vue({
 });
 
 
-let Grid = new Vue({
-    el: '#grid',
-    template:
-        `
-        <div id="grid" :style="field.size">
-            <div class="row" v-for="y in field.y" :key="y.id">
-                <div
-                    class="block" :class="isOpened(x, y)" v-for="x in field.x" :key="x.id" :x="x" :y="y"
-                ></div>
-            </div>
-        </div>
-        `,
-    data: {
-        field: {
-            x: 16,
-            y: 16,
-            mineNum: 40,
-            size: {width: '480px', height: '480px'}
-        },
-    },
-    computed: {
-        isOpened: function (x, y) {
-            Block.initData();
-            return {
-                opened : Block.isOpened[x][y]
-            };
-        }
-    },
-    methods: {
-        switchGrid: function (level) {
-            this.field = Game.diff[level];
-        },
-        openGrid: function (x, y) {
-            if (Game.GameStart(x, y)) {
-                if (!Game.isOver && !Block.isOpened[x][y]) {
-                    if (!Block.isFlagged[x][y]) {
-                        Game.openBlock();
-                    }
-                }
-            }
-        },
-        setFlag: function (x, y) {
-            if (Game.GameStart(x, y)) {
-                if (!Block.isOpened(x, y)) {
-                    if (!Block.isFlagged(x, y)) {
-                        Block.setFlagged();
-                        //add::before
-                        Bar.setMineNum(-1);
-                    } else {
-                        Block.removeFlagged();
-                        ////remove::before
-                        Bar.setMineNum(1);
-                    }
-                }
-            }
-        },
-        removeGrid: function () {  //应该不用这个
-            ;
-        },
-        setGameOver: function (bool, x, y) {
-            if (bool) {
-                for (let i = 0; i < Grid.field.x; i++) {
-                    for (let j = 0; j < Grid.field.y; j++) {
-                        if (!Block.isOpened[i][j]) {
-                            //add flag
-                        }
-                    }
-                }
-            } else {
-                //add bomb0
-                for (let i = 0; i < Grid.field.x; i++) {
-                    for (let j = 0; j < Grid.field.y; j++) {
-                        if (Block.isMine[i][j]) {
-                            //add bomb
-                        }
-                        if (Block.isFlagged[i][j] && !Block.isMine[i][j]) {
-                            //add wrongflag
-                        }
-                    }
-                }
-            }
-        }
-    }
-});
-
 let Game = new Vue({
     data: {
         diff: {
@@ -209,16 +209,6 @@ let Game = new Vue({
         isStart: false,
         isOver: true,
         notMine: 0,
-        around = [
-            [x - 1, y - 1],
-            [x, y - 1],
-            [x + 1, y - 1],
-            [x - 1, y],
-            [x + 1, y],
-            [x - 1, y + 1],
-            [x, y + 1],
-            [x + 1, y + 1],
-        ],
     },
     methods: {
         isGameEnd: function () {
@@ -232,8 +222,8 @@ let Game = new Vue({
             );
         },
         openBlock: function (x, y) {
-            if (!Block.isBomb) {
-                if (!Block.isFlagged) {
+            if (!Block.isBomb(x, y)) {
+                if (!Block.Flagged(x, y)) {
                     Block.isOpened = true;
                     //Grid.open
                     this.notMine = Grid.field.x * Grid.field.y - Grid.field.mineNum; //暂时放这
@@ -243,10 +233,20 @@ let Game = new Vue({
                             if ((Block.isBomb[v[0]] || {})[v[1]] || {}) count++;
                         }
                     });
+                    const around = [
+                        [x - 1, y - 1],
+                        [x, y - 1],
+                        [x + 1, y - 1],
+                        [x - 1, y],
+                        [x + 1, y],
+                        [x - 1, y + 1],
+                        [x, y + 1],
+                        [x + 1, y + 1],
+                    ];
                     if (count == 0) {
                         around.forEach((v) => {
                             if (between(v[0], Grid.field.x) && between(v[1], Grid.field.y)) {
-                                if (!(Block.isOpened[v[0]][v[1]])) {
+                                if (!Block.Opened([v[0]], [v[1]])) {
                                     return this.openBlock(v[0], v[1]);
                                 }
                             }
