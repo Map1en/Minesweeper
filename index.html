@@ -14,12 +14,12 @@
         <h1>Minesweeper</h1>
         <div id="bar">
             <div class="label">
-                <div id="newBtn" @click="newGame()">新游戏</div>
+                <div id="newBtn" @click="chknewGame()">新游戏</div>
             </div>
             <div class="label" id="select">
-                <div :class="{ selected: level[0]}" @click="selectLevel(0)">新手</div>
-                <div :class="{ selected: level[1]}" @click="selectLevel(1)">普通</div>
-                <div :class="{ selected: level[2]}" @click="selectLevel(2)">困难</div>
+                <div :class="{ selected: level[0]}" @click="switchLevel(0)">新手</div>
+                <div :class="{ selected: level[1]}" @click="switchLevel(1)">普通</div>
+                <div :class="{ selected: level[2]}" @click="switchLevel(2)">困难</div>
             </div>
             <div class="label data" style="width: 120px;">
                 <div class="icon">
@@ -41,7 +41,8 @@
             </div>
         </div>
         <hr>
-        <div id="grid"></div>
+        <div id="grid" :style="field.size">
+        </div>
     </div>
 </body>
 <script src="script.js"></script>
