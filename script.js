@@ -25,7 +25,7 @@ let Bar = new Vue({
         },
         switchLevel: function (level) {
             if (Game.isGameEnd()) {
-                this.level = this.level.map(() => false);
+                this.level.fill(false);
                 this.level[level] = true;
                 this.switchMineNum(level);
                 this.resetStep();
@@ -66,7 +66,7 @@ let Grid = new Vue({
         <div id="grid" :style="field.size">
             <div class="row" v-for="y in field.y" :key="y.id">
                 <div
-                    class="block" :class="isOpened(x, y)" v-for="x in field.x" :key="x.id" :x="x" :y="y"
+                    class="block" :class="" v-for="x in field.x" :key="x.id" :x="x" :y="y"
                 ></div>
             </div>
         </div>
@@ -79,14 +79,14 @@ let Grid = new Vue({
             size: {width: '480px', height: '480px'}
         },
     },
-    computed: {
-        isOpened: function (x, y) {
-            Block.initData();
-            return {
-                opened : Block.Opened(x, y)
-            };
-        }
-    },
+    // computed: {
+    //     isOpened: function (x, y) {
+    //         Block.initData();
+    //         return {
+    //             opened : Block.Opened(x, y)
+    //         };
+    //     }
+    // },
     methods: {
         switchGrid: function (level) {
             this.field = Game.diff[level];
