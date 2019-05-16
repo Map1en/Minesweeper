@@ -9,10 +9,10 @@ let blockData = {
 let timer;
 
 //DOM
-let bArea = document.getElementById("block-area");
-let easyLevel = document.getElementById("easy");
-let normalLevel = document.getElementById("normal");
-let hardLevel = document.getElementById("hard");
+let bArea = document.getElementById("block-area"),
+    easyLevel = document.getElementById("easy"),
+    normalLevel = document.getElementById("normal"),
+    hardLevel = document.getElementById("hard");
 
 setBar();
 
@@ -40,9 +40,7 @@ class Block {
         for (let k = 0; k < blockData["mineNum"]; k++) {
             const R1 = ~~(Math.random() * blockData["xLen"]);
             const R2 = ~~(Math.random() * blockData["yLen"]);
-            if (R1 == x && R2 == y) {      //第一次点击不会踩雷
-                k--;
-            } else if (this.array[R1][R2].isMine) {
+            if ((R1 == x && R2 == y) || this.array[R1][R2].isMine) {      //第一次点击不会踩雷
                 k--;
             } else {
                 this.array[R1][R2].isMine = true;
@@ -50,7 +48,7 @@ class Block {
         }
     }
     detectSetMine(x, y) {
-        if (this.array[0] == undefined) {
+        if (!this.array[0]) {
             this.setMine(x, y);
             Timer();
         }
@@ -106,11 +104,9 @@ class Block {
     }
     perOpen(x, y) {
         this.detectSetMine(x, y);
-        if (!isOver && !this.array[x][y].opened) {
-            if (!this.array[x][y].flagged) {
-                this.openBlock(x, y);
-                setStep();
-            }
+        if (!isOver && !this.array[x][y].opened && !this.array[x][y].flagged) {
+            this.openBlock(x, y);
+            setStep();
         }
     }
     openBlock(x, y) {
@@ -190,10 +186,10 @@ function result(end, x, y) {
 }
 
 function confirmNext(result) {
-    let percent = (openedBlock / game.notMine * 100).toFixed(2);
-    let message = {
+    const percent = (openedBlock / game.notMine * 100).toFixed(2);
+    const message = {
         1 : "胜利！用时" + (time / 100).toFixed(2) + "秒！要进行下盘游戏吗？",
-        2 : "糟糕踩到雷啦！完成度"+percent+"%！要不要重开一盘？"
+        2 : "糟糕踩到雷啦！完成度" + percent + "%！要不要重开一盘？"
     };
     if (result ? confirm(message[1]) : confirm(message[2])) {
         initGame();
@@ -210,10 +206,10 @@ function newGame() {
 
 function initGame() {
     stopTimer();
-    time = 0;
-    step = 0;
-    flaggedMine = 0;
-    openedBlock = 0;
+    time = 0,
+    step = 0,
+    flaggedMine = 0,
+    openedBlock = 0,
     isOver = false;
     setInnerById("mine", blockData["mineNum"]);
     setInnerById("step", step);
@@ -288,42 +284,3 @@ function between(x, max) {
 }
 
 window.onload = newGame();
-
-
-//------------------------------------------------------------------
-//
-// function doubleClick(x, y) {
-//     if (game.array[x][y].opened) {
-
-//         const around = [
-//             [x - 1, y - 1],
-//             [x, y - 1],
-//             [x + 1, y - 1],
-//             [x - 1, y],
-//             [x + 1, y],
-//             [x - 1, y + 1],
-//             [x, y + 1],
-//             [x + 1, y + 1],
-//         ];
-//         let mCount, fCount;
-//         around.forEach(function(item) {
-//             if ((game.array[item[0]] || {})([item[1]] || {}).isMine) {
-//                 mCount++;
-//             }
-//             if ((game.array[item[0]] || {})([item[1]] || {}).flagged) {
-//                 fCount++;
-//             }
-//         });
-//         if (mCount == fCount) {
-//             around.forEach(function(item) {
-//                 if ((game.array[item[0]] || {})([item[1]] || {}).isMine) {
-//                     if (!((game.array[item[0]] || {})([item[1]] || {}).flagged)) {
-//                         lose();
-//                     }
-//                 } else {
-//                     openBlock((game.array[item[0]] || {}), (game.array[item[1]] || {}));
-//                 }
-//             });
-//         }
-//     }
-// }
